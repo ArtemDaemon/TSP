@@ -5,15 +5,23 @@ from Node import Node
 
 def solve_tsp(matrix):
     nodes = []
-    start_node = Node(matrix.copy(), 0)
+    start_node = Node(matrix.copy(), 0, [])
 
     nodes.append(start_node)
 
     current_node = pop_min_node(nodes)
+    new_nodes = current_node.subset()
+    for new_node in new_nodes:
+        nodes.append(new_node)
 
+    current_node = pop_min_node(nodes)
+    new_nodes = current_node.subset()
+    for new_node in new_nodes:
+        nodes.append(new_node)
 
-    # new_branch = current_node.define_branch()
-
+    # for node in nodes:
+    #     node.display()
+    #     print('/////////////////////////')
     # new_matrix, new_h, step = utils.subset(matrix, new_branch)
     # h += new_h
     #

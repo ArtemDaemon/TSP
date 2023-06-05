@@ -1,7 +1,11 @@
+import numpy as np
+
+
 class Node(object):
-    def __init__(self, matrix, h):
-        self.matrix, self.h = self.reduction(matrix, h)
-        self.steps = []
+    def __init__(self, matrix, h, steps):
+        self.matrix, self.h = self.reduction(matrix)
+        self.h += h
+        self.steps = steps
 
     def get_h(self):
         return self.h
@@ -11,7 +15,7 @@ class Node(object):
 
     # REDUCTION
     @staticmethod
-    def reduction(matrix, h):
+    def reduction(matrix):
         matrix, h1 = Node.reduction_lines(matrix)
         matrix, h2 = Node.reduction_columns(matrix)
         return matrix, h1 + h2
@@ -54,17 +58,9 @@ class Node(object):
     # SUBSET
     def subset(self):
         branch = self.define_branch(self.matrix)
-        excluded_node = self.exclude_branch(self, branch)
-        included_node = self.include_branch(self, branch)
-        if h1 < h2:
-            matrix = matrix1
-            h = h1
-            step = None
-        else:
-            matrix = matrix2
-            h = h2
-            step = branch
-        return matrix, h, step
+        excluded_node = self.exclude_branch(branch)
+        included_node = self.include_branch(branch)
+        return [excluded_node, included_node]
 
     # DEFINING BRANCH
     @staticmethod
@@ -127,20 +123,19 @@ class Node(object):
 
     # END OF DEFINING BRANCH
 
-    def exclude_branch(matrix, branch):
-        new_matrix = matrix[branch[0]][branch[1]]
-        excluded_node = Node(matrix.copy())
-         = -1
-        node_matrix, h = reduction(matrix)
-        return Node(node_matrix, h)
+    def exclude_branch(self, branch):
+        new_matrix = self.matrix.copy()
+        new_matrix[branch[0]][branch[1]] = -1
+        return Node(new_matrix, self.h, self.steps.copy())
 
-
-    def include_branch(matrix, branch):
-        matrix[branch[1]][branch[0]] = -1
-        matrix = np.delete(matrix, branch[0], axis=0)
-        matrix = np.delete(matrix, branch[1], axis=1)
-        node_matrix, h = reduction(matrix)
-        return Node(node_matrix, h)
+    def include_branch(self, branch):
+        new_matrix = self.matrix.copy()
+        new_matrix[branch[1]][branch[0]] = -1
+        new_matrix = np.delete(new_matrix, branch[0], axis=0)
+        new_matrix = np.delete(new_matrix, branch[1], axis=1)
+        new_steps = self.steps.copy()
+        new_steps.append(branch)
+        return Node(new_matrix, self.h, new_steps)
 
     # END SUBSET
 
