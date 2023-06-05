@@ -1,16 +1,47 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+import numpy as np
+import utils
+from Node import Node
 
 
-# Press the green button in the gutter to run the script.
+def solve_tsp(matrix):
+    nodes = []
+    start_node = Node(matrix.copy(), 0)
+
+    nodes.append(start_node)
+
+    current_node = pop_min_node(nodes)
+
+
+    # new_branch = current_node.define_branch()
+
+    # new_matrix, new_h, step = utils.subset(matrix, new_branch)
+    # h += new_h
+    #
+    # new_branch = utils.define_branch(new_matrix)
+    # new_matrix, new_h, step = utils.subset(new_matrix, new_branch)
+    # h += new_h
+
+    # END RESULT
+    result = [0, 2, 3, 1, 4]
+    return result, 12.0
+
+
+def pop_min_node(nodes):
+    min_node = nodes[0]
+    index = 0
+    for i, node in enumerate(nodes):
+        if node.get_h() < min_node.get_h():
+            min_node = node
+            index = i
+    del nodes[index]
+    return min_node
+
+
 if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    matrix = np.array([[-1, 20, 18, 12, 8],
+                       [5, -1, 14, 7, 11],
+                       [12, 18, -1, 6, 11],
+                       [11, 17, 11, -1, 12],
+                       [5, 5, 5, 5, -1]])
+    solve_tsp(matrix)
+    # print(solve_tsp(matrix))
