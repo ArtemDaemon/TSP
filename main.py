@@ -16,10 +16,10 @@ def solve_tsp(matrix):
     for new_node in new_nodes:
         nodes.append(new_node)
 
-    current_node = pop_min_node(nodes)
-    new_nodes = current_node.subset()
-    for new_node in new_nodes:
-        nodes.append(new_node)
+    # current_node = pop_min_node(nodes)
+    # new_nodes = current_node.subset()
+    # for new_node in new_nodes:
+    #     nodes.append(new_node)
 
     for node in nodes:
         node.display()
@@ -51,7 +51,7 @@ def pop_min_node(nodes):
 
 def create_indexes_lists(matrix):
     indexes_list = list(range(1, len(matrix) + 1))
-    return indexes_list, indexes_list
+    return indexes_list, indexes_list.copy()
 
 
 if __name__ == '__main__':

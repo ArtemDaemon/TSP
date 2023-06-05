@@ -136,27 +136,28 @@ class Node(object):
 
         branch_line = self.line_indexes[branch[0]]
         branch_column = self.column_indexes[branch[1]]
-        excluded_line = self.indexes_lists[0].index(branch_column)
-        excluded_column = self.indexes_lists[1].index(branch_line)
+        excluded_line = self.column_indexes.index(branch_line)
+        excluded_column = self.line_indexes.index(branch_column)
 
-        new_matrix[excluded_line][excluded_column] = -1
+        new_matrix[excluded_column][excluded_line] = -1
         new_matrix = np.delete(new_matrix, branch[0], axis=0)
         new_matrix = np.delete(new_matrix, branch[1], axis=1)
 
         new_steps = self.steps.copy()
         new_steps.append([branch_line, branch_column])
 
-        new_indexes_lists = self.indexes_lists.copy()
-        del new_indexes_lists[0][branch[0]]
-        del new_indexes_lists[1][branch[1]]
-        print(self.indexes_lists)
+        new_line_indexes = self.line_indexes.copy()
+        del new_line_indexes[branch[0]]
+        new_column_indexes = self.column_indexes.copy()
+        del new_column_indexes[branch[1]]
 
-        return Node(new_matrix, self.h, new_steps, new_indexes_lists)
+        return Node(new_matrix, self.h, new_steps, new_line_indexes, new_column_indexes)
 
     # END SUBSET
 
     def display(self):
-        print(self.indexes_lists)
+        print(self.line_indexes)
+        print(self.column_indexes)
         print(self.matrix)
         print(self.h)
         print(self.steps)
