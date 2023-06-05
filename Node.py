@@ -13,8 +13,8 @@ class Node(object):
     def get_h(self):
         return self.h
 
-    def add_step(self, branch):
-        self.steps.append(branch)
+    def get_length(self):
+        return len(self.matrix)
 
     # REDUCTION
     @staticmethod
@@ -134,6 +134,7 @@ class Node(object):
     def include_branch(self, branch):
         new_matrix = self.matrix.copy()
 
+        print(branch)
         branch_line = self.line_indexes[branch[0]]
         branch_column = self.column_indexes[branch[1]]
         excluded_line = self.column_indexes.index(branch_line)
@@ -154,6 +155,23 @@ class Node(object):
         return Node(new_matrix, self.h, new_steps, new_line_indexes, new_column_indexes)
 
     # END SUBSET
+
+    def parse(self):
+        if self.matrix[0][0] == -1:
+            new_steps = self.create_steps([[0, 1], [1, 0]])
+        else:
+            new_steps = self.create_steps([[0, 0], [1, 1]])
+
+        for new_step in new_steps:
+            self.steps.append(new_step)
+
+    def create_steps(self, indexes_list):
+        new_steps = []
+        for indexes in indexes_list:
+            new_step_line = self.line_indexes[indexes[0]]
+            new_step_column = self.column_indexes[indexes[1]]
+            new_steps.append([new_step_line, new_step_column])
+        return new_steps
 
     def display(self):
         print(self.line_indexes)
