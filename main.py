@@ -5,7 +5,9 @@ from Node import Node
 
 def solve_tsp(matrix):
     nodes = []
-    start_node = Node(matrix.copy(), 0, [])
+
+    line_indexes, column_indexes = create_indexes_lists(matrix)
+    start_node = Node(matrix.copy(), 0, [], line_indexes, column_indexes)
 
     nodes.append(start_node)
 
@@ -19,9 +21,11 @@ def solve_tsp(matrix):
     for new_node in new_nodes:
         nodes.append(new_node)
 
-    # for node in nodes:
-    #     node.display()
-    #     print('/////////////////////////')
+    for node in nodes:
+        node.display()
+        print('/////////////////////////')
+
+
     # new_matrix, new_h, step = utils.subset(matrix, new_branch)
     # h += new_h
     #
@@ -43,6 +47,11 @@ def pop_min_node(nodes):
             index = i
     del nodes[index]
     return min_node
+
+
+def create_indexes_lists(matrix):
+    indexes_list = list(range(1, len(matrix) + 1))
+    return indexes_list, indexes_list
 
 
 if __name__ == '__main__':

@@ -2,10 +2,13 @@ import numpy as np
 
 
 class Node(object):
-    def __init__(self, matrix, h, steps):
+    def __init__(self, matrix, h, steps, line_indexes, column_indexes):
         self.matrix, self.h = self.reduction(matrix)
         self.h += h
+
         self.steps = steps
+        self.line_indexes = line_indexes
+        self.column_indexes = column_indexes
 
     def get_h(self):
         return self.h
@@ -126,20 +129,34 @@ class Node(object):
     def exclude_branch(self, branch):
         new_matrix = self.matrix.copy()
         new_matrix[branch[0]][branch[1]] = -1
-        return Node(new_matrix, self.h, self.steps.copy())
+        return Node(new_matrix, self.h, self.steps.copy(), self.line_indexes.copy(), self.column_indexes.copy())
 
     def include_branch(self, branch):
         new_matrix = self.matrix.copy()
-        new_matrix[branch[1]][branch[0]] = -1
+
+        branch_line = self.line_indexes[branch[0]]
+        branch_column = self.column_indexes[branch[1]]
+        excluded_line = self.indexes_lists[0].index(branch_column)
+        excluded_column = self.indexes_lists[1].index(branch_line)
+
+        new_matrix[excluded_line][excluded_column] = -1
         new_matrix = np.delete(new_matrix, branch[0], axis=0)
         new_matrix = np.delete(new_matrix, branch[1], axis=1)
+
         new_steps = self.steps.copy()
-        new_steps.append(branch)
-        return Node(new_matrix, self.h, new_steps)
+        new_steps.append([branch_line, branch_column])
+
+        new_indexes_lists = self.indexes_lists.copy()
+        del new_indexes_lists[0][branch[0]]
+        del new_indexes_lists[1][branch[1]]
+        print(self.indexes_lists)
+
+        return Node(new_matrix, self.h, new_steps, new_indexes_lists)
 
     # END SUBSET
 
     def display(self):
+        print(self.indexes_lists)
         print(self.matrix)
         print(self.h)
         print(self.steps)
