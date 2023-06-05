@@ -134,13 +134,13 @@ class Node(object):
     def include_branch(self, branch):
         new_matrix = self.matrix.copy()
 
-        print(branch)
         branch_line = self.line_indexes[branch[0]]
         branch_column = self.column_indexes[branch[1]]
-        excluded_line = self.column_indexes.index(branch_line)
-        excluded_column = self.line_indexes.index(branch_column)
+        if branch_line in self.column_indexes and branch_column in self.line_indexes:
+            excluded_line = self.column_indexes.index(branch_line)
+            excluded_column = self.line_indexes.index(branch_column)
+            new_matrix[excluded_column][excluded_line] = -1
 
-        new_matrix[excluded_column][excluded_line] = -1
         new_matrix = np.delete(new_matrix, branch[0], axis=0)
         new_matrix = np.delete(new_matrix, branch[1], axis=1)
 
