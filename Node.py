@@ -1,4 +1,5 @@
 import numpy as np
+import asyncio
 
 
 class Node(object):
@@ -59,10 +60,17 @@ class Node(object):
 
     # END REDUCTION
     # SUBSET
-    def subset(self):
+    async def subset(self):
         branch = self.define_branch(self.matrix)
-        excluded_node = self.exclude_branch(branch)
-        included_node = self.include_branch(branch)
+        exclude_task = asyncio.create_task(self.exclude_branch(branch))
+        include_task = asyncio.create_task(self.include_branch(branch))
+        await exclude_task
+        await include_task
+        excluded_node = exclude_task.result()
+        included_node = include_task.result()
+
+        # excluded_node = self.exclude_branch(branch)
+        # included_node = self.include_branch(branch)
         return [excluded_node, included_node]
 
     # DEFINING BRANCH
@@ -126,12 +134,12 @@ class Node(object):
 
     # END OF DEFINING BRANCH
 
-    def exclude_branch(self, branch):
+    async def exclude_branch(self, branch):
         new_matrix = self.matrix.copy()
         new_matrix[branch[0]][branch[1]] = -1
         return Node(new_matrix, self.h, self.steps.copy(), self.line_indexes.copy(), self.column_indexes.copy())
 
-    def include_branch(self, branch):
+    async def include_branch(self, branch):
         new_matrix = self.matrix.copy()
 
         branch_line = self.line_indexes[branch[0]]
@@ -172,10 +180,3 @@ class Node(object):
             new_step_column = self.column_indexes[indexes[1]]
             new_steps.append([new_step_line, new_step_column])
         return new_steps
-
-    def display(self):
-        print(self.line_indexes)
-        print(self.column_indexes)
-        print(self.matrix)
-        print(self.h)
-        print(self.steps)

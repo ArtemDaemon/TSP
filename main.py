@@ -1,25 +1,37 @@
+import asyncio
+import io
 import math
+
 import numpy as np
 import csv
+from progress.bar import ChargingBar as Bar
 
 from Node import Node
 
+START_POINT = 3753
 
-def solve_tsp(matrix):
+
+async def solve_tsp(matrix):
     nodes = []
 
     line_indexes, column_indexes = create_indexes_lists(matrix)
     start_node = Node(matrix.copy(), 0, [], line_indexes, column_indexes)
 
+    total_length = start_node.get_length()
+    bar = Bar('Processing', max=total_length, suffix='%(percent)d%% [%(index)d/%(max)d]')
+
     nodes.append(start_node)
     current_node = pop_min_node(nodes)
 
     while current_node.get_length() > 2:
-        new_nodes = current_node.subset()
+        new_nodes = await current_node.subset()
+        # new_nodes = current_node.subset()
         for new_node in new_nodes:
             nodes.append(new_node)
         current_node = pop_min_node(nodes)
-
+        bar.goto(total_length - current_node.get_length())
+    bar.goto(total_length)
+    bar.finish()
     current_node.parse()
     return current_node.h, current_node.steps
 
@@ -70,7 +82,8 @@ def format_steps(steps, first_point, matrix):
 
 def read_csv(filename):
     result = []
-    with open(filename, newline='') as csvfile:
+    with io.open(filename, mode='r', encoding='utf-8', newline='') as csvfile:
+        # with open(filename, newline='') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
         next(spamreader)
         for row in spamreader:
@@ -85,15 +98,28 @@ def write_csv(filename, data):
             spamwriter.writerow(row)
 
 
-if __name__ == '__main__':
-    data = read_csv('data_top5.csv')
-    matrix = create_matrix(data)
+async def main():
+    # print('Reading CSV-file')
+    # data = read_csv('data.csv')
     #
-    # matrix = np.array([[-1, 20, 18, 12, 8],
-    #                    [5, -1, 14, 7, 11],
-    #                    [12, 18, -1, 6, 11],
-    #                    [11, 17, 11, -1, 12],
-    #                    [5, 5, 5, 5, -1]])
-    distance, steps = solve_tsp(matrix)
-    formatted_steps = format_steps(steps, 0, matrix)
+    # print('Creating the matrix')
+    # matrix = create_matrix(data)
+    matrix = np.array([[-1, 10, 15, 20], [10, -1, 35, 25], [15, 35, -1, 30], [20, 25, 30, -1]])
+
+    print('Start Solving (The number of steps taken may decrease)')
+    solve_task = asyncio.create_task(solve_tsp(matrix))
+    await solve_task
+    distance, steps = solve_task.result()
+    # distance, steps = solve_tsp(matrix)
+
+    print('Formatting the result')
+    formatted_steps = format_steps(steps, 3753, matrix)
+
+    print('Writing solution CSV-file')
     write_csv('solution.csv', formatted_steps)
+    print(steps)
+    print(distance)
+
+
+if __name__ == '__main__':
+    asyncio.run(main())
