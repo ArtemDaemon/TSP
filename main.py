@@ -1,6 +1,7 @@
 import math
-
 import numpy as np
+import csv
+
 from Node import Node
 
 
@@ -35,7 +36,7 @@ def pop_min_node(nodes):
 
 
 def create_indexes_lists(matrix):
-    indexes_list = list(range(1, len(matrix) + 1))
+    indexes_list = list(range(0, len(matrix)))
     return indexes_list, indexes_list.copy()
 
 
@@ -53,19 +54,38 @@ def create_matrix(data):
     return np.array(matrix)
 
 
-def format_steps(steps, first_point):
+def format_steps(steps, first_point, matrix):
     result = []
+    temp_steps = steps.copy()
+    for i in range(0, len(steps) - 1):
+        for j, step in enumerate(temp_steps):
+            if step[0] == first_point:
+                distance = matrix[step[0]][step[1]]
+                result.append([i, distance])
+                first_point = step[1]
+                del temp_steps[j]
+                break
+    return result
+
+
+def read_csv(filename):
+    with open(filename, newline='') as csvfile:
+        spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+        for row in spamreader:
+            print(', '.join(row))
 
 
 if __name__ == '__main__':
     # data = [[10, 15], [7, 11]]
     # matrix = create_matrix(data)
-    matrix = np.array([[-1, 20, 18, 12, 8],
-                       [5, -1, 14, 7, 11],
-                       [12, 18, -1, 6, 11],
-                       [11, 17, 11, -1, 12],
-                       [5, 5, 5, 5, -1]])
-    distance, steps = solve_tsp(matrix)
-    formatted_steps = format_steps(steps, 0)
-    print(formatted_steps)
-    print(distance)
+    #
+    # matrix = np.array([[-1, 20, 18, 12, 8],
+    #                    [5, -1, 14, 7, 11],
+    #                    [12, 18, -1, 6, 11],
+    #                    [11, 17, 11, -1, 12],
+    #                    [5, 5, 5, 5, -1]])
+    # distance, steps = solve_tsp(matrix)
+    # formatted_steps = format_steps(steps, 0, matrix)
+    # print(formatted_steps)
+    # print(distance)
+    read_csv('data_top5.csv')
