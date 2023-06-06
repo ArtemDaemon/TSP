@@ -69,23 +69,31 @@ def format_steps(steps, first_point, matrix):
 
 
 def read_csv(filename):
+    result = []
     with open(filename, newline='') as csvfile:
-        spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+        spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
+        next(spamreader)
         for row in spamreader:
-            print(', '.join(row))
+            result.append([int(x) for x in row[-2:]])
+    return result
+
+
+def write_csv(filename, data):
+    with open(filename, 'w', newline='') as csvfile:
+        spamwriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        for row in data:
+            spamwriter.writerow(row)
 
 
 if __name__ == '__main__':
-    # data = [[10, 15], [7, 11]]
-    # matrix = create_matrix(data)
+    data = read_csv('data_top5.csv')
+    matrix = create_matrix(data)
     #
     # matrix = np.array([[-1, 20, 18, 12, 8],
     #                    [5, -1, 14, 7, 11],
     #                    [12, 18, -1, 6, 11],
     #                    [11, 17, 11, -1, 12],
     #                    [5, 5, 5, 5, -1]])
-    # distance, steps = solve_tsp(matrix)
-    # formatted_steps = format_steps(steps, 0, matrix)
-    # print(formatted_steps)
-    # print(distance)
-    read_csv('data_top5.csv')
+    distance, steps = solve_tsp(matrix)
+    formatted_steps = format_steps(steps, 0, matrix)
+    write_csv('solution.csv', formatted_steps)
