@@ -68,7 +68,9 @@ def main():
               [5, 5, 5, 5, MAX_VALUE]]
 
     print('Start Solving')
-    genetic.solve_tsp(matrix, len(matrix), START_POINT)
+    distance, route = genetic.solve_tsp(matrix, len(matrix), START_POINT)
+    print(distance)
+    print(route)
 
 
 if __name__ == '__main__':
