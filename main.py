@@ -1,15 +1,16 @@
 import io
 import math
 import csv
+from progress.bar import ChargingBar as Bar
 
 from genetic import genetic
 
-# START_POINT = 3753
-START_POINT = 0
+START_POINT = 3753
 MAX_VALUE = 17976931348623157.0
 
 
 def create_matrix(data):
+    bar = Bar('Creating', max=len(data), suffix='%(percent)d%% [%(index)d/%(max)d]')
     matrix = []
     for i, point_x in enumerate(data):
         line = []
@@ -20,20 +21,19 @@ def create_matrix(data):
                 euclidian_distance = math.sqrt((point_x[0] - point_y[0]) ** 2 + (point_x[1] - point_y[1]) ** 2)
             line.append(euclidian_distance)
         matrix.append(line)
+        bar.next()
+    bar.finish()
     return matrix
 
 
-def format_steps(steps, first_point, matrix):
+def format_route(route, matrix):
     result = []
-    temp_steps = steps.copy()
-    for i in range(0, len(steps) - 1):
-        for j, step in enumerate(temp_steps):
-            if step[0] == first_point:
-                distance = matrix[step[0]][step[1]]
-                result.append([i, distance])
-                first_point = step[1]
-                del temp_steps[j]
-                break
+    i = 0
+    print(len)
+    while i < len(route):
+        print(i)
+        result.append([i, matrix[route[i]][route[i + 1]]])
+        i += 1
     return result
 
 
@@ -56,21 +56,19 @@ def write_csv(filename, data):
 
 
 def main():
-    # print('Reading CSV-file')
-    # data = read_csv('data.csv')
-    #
-    # print('Creating the matrix')
-    # matrix = create_matrix(data)
-    matrix = [[MAX_VALUE, 20, 18, 12, 8],
-              [5, MAX_VALUE, 14, 7, 11],
-              [12, 18, MAX_VALUE, 6, 11],
-              [11, 17, 11, MAX_VALUE, 12],
-              [5, 5, 5, 5, MAX_VALUE]]
+    print('Reading CSV-file')
+    data = read_csv('data.csv')
+
+    print('Creating the matrix')
+    matrix = create_matrix(data)
 
     print('Start Solving')
     distance, route = genetic.solve_tsp(matrix, len(matrix), START_POINT)
-    print(distance)
-    print(route)
+    formatted_route = format_route(route, matrix)
+    print(route[0])
+    print(route[1])
+    print('/////////////')
+    print(formatted_route[0])
 
 
 if __name__ == '__main__':

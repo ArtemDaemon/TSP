@@ -1,12 +1,14 @@
 from random import randint, shuffle
+from progress.bar import ChargingBar as Bar
 
 from .gene import Gene
 
-ITERATIONS = 100
-POPULATION_SIZE = 10
-DIVIDER_RATE = 2000
+ITERATIONS = 100000
+POPULATION_SIZE = 100
+DIVIDER = 10000
 DEVIATION_EXP = 100
 DEVIATION_THRESHOLD = 0.5
+MUTATION_ATTEMPT_LIMIT = 100
 
 
 def create_route(length, first_step):
@@ -41,15 +43,21 @@ def mutate(route, length):
     return new_route
 
 
-def solve_tsp(matrix, length, first_step):
-    generation = []
-
+def create_first_generation(matrix, length, first_step):
+    first_generation = []
     for i in range(POPULATION_SIZE):
         new_route = create_route(length, first_step)
-        generation.append(Gene(new_route, calculate_distance(new_route, matrix, length)))
+        first_generation.append(Gene(new_route, calculate_distance(new_route, matrix, length)))
+    return first_generation
+
+
+def solve_tsp(matrix, length, first_step):
+    generation = create_first_generation(matrix, length, first_step)
 
     min_distance = generation[0].get_distance()
     final_route = generation[0].get_route()
+
+    bar = Bar('Processing', max=ITERATIONS, suffix='%(percent)d%% [%(index)d/%(max)d]')
 
     for i in range(ITERATIONS):
         new_generation = []
@@ -61,14 +69,15 @@ def solve_tsp(matrix, length, first_step):
             mutated_distance = current_distance + 1
             deviation = False
 
-            while mutated_distance <= current_distance and not deviation:
+            attempt = 0
+            while mutated_distance <= current_distance and not deviation and attempt < MUTATION_ATTEMPT_LIMIT:
                 mutated_route = mutate(current_gene.get_route(), length)
                 mutated_distance = calculate_distance(mutated_route, matrix, length)
 
-                divider = (ITERATIONS - i) * DIVIDER_RATE
-                deviation_factor = pow(DEVIATION_EXP, -1 * (mutated_distance - current_gene.get_distance()) / divider)
+                deviation_factor = pow(DEVIATION_EXP, -1 * (mutated_distance - current_gene.get_distance()) / DIVIDER)
                 if deviation_factor > DEVIATION_THRESHOLD:
                     deviation = True
+                attempt += 1
 
             new_gene = Gene(mutated_route, mutated_distance)
             new_generation.append(new_gene)
@@ -78,7 +87,6 @@ def solve_tsp(matrix, length, first_step):
                 final_route = mutated_route
 
         generation = new_generation
-
+        bar.next()
+    bar.finish()
     return min_distance, final_route
-
-
