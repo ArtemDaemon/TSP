@@ -29,9 +29,7 @@ def create_matrix(data):
 def format_route(route, matrix):
     result = []
     i = 0
-    print(len)
-    while i < len(route):
-        print(i)
+    while i < (len(route) - 1):
         result.append([i, matrix[route[i]][route[i + 1]]])
         i += 1
     return result
@@ -51,6 +49,7 @@ def read_csv(filename):
 def write_csv(filename, data):
     with open(filename, 'w', newline='') as csvfile:
         spamwriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        spamwriter.writerow(['Id', 'Predicted'])
         for row in data:
             spamwriter.writerow(row)
 
@@ -64,11 +63,14 @@ def main():
 
     print('Start Solving')
     distance, route = genetic.solve_tsp(matrix, len(matrix), START_POINT)
+
+    print('Formatting the output')
     formatted_route = format_route(route, matrix)
-    print(route[0])
-    print(route[1])
-    print('/////////////')
-    print(formatted_route[0])
+
+    print('Writing CSV-file')
+    write_csv('solution.csv', formatted_route)
+
+    print('Done!')
 
 
 if __name__ == '__main__':

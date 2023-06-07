@@ -4,10 +4,7 @@ from progress.bar import ChargingBar as Bar
 from .gene import Gene
 
 ITERATIONS = 100000
-POPULATION_SIZE = 100
-DIVIDER = 10000
-DEVIATION_EXP = 100
-DEVIATION_THRESHOLD = 0.5
+POPULATION_SIZE = 500
 MUTATION_ATTEMPT_LIMIT = 100
 
 
@@ -67,17 +64,17 @@ def solve_tsp(matrix, length, first_step):
 
             mutated_route = current_gene.get_route()
             mutated_distance = current_distance + 1
-            deviation = False
 
             attempt = 0
-            while mutated_distance <= current_distance and not deviation and attempt < MUTATION_ATTEMPT_LIMIT:
+            while mutated_distance <= current_distance:
                 mutated_route = mutate(current_gene.get_route(), length)
                 mutated_distance = calculate_distance(mutated_route, matrix, length)
 
-                deviation_factor = pow(DEVIATION_EXP, -1 * (mutated_distance - current_gene.get_distance()) / DIVIDER)
-                if deviation_factor > DEVIATION_THRESHOLD:
-                    deviation = True
                 attempt += 1
+                if attempt == MUTATION_ATTEMPT_LIMIT:
+                    mutated_route = current_gene.get_route()
+                    mutated_distance = current_distance
+                    break
 
             new_gene = Gene(mutated_route, mutated_distance)
             new_generation.append(new_gene)
