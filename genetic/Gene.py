@@ -8,3 +8,9 @@ class Gene:
 
     def __lt__(self, other):
         return self.distance < other.distance
+
+    def get_distance(self):
+        return self.distance
+
+    def get_route(self):
+        return self.route

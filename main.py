@@ -4,7 +4,9 @@ import csv
 
 from genetic import genetic
 
-START_POINT = 3753
+# START_POINT = 3753
+START_POINT = 0
+MAX_VALUE = 17976931348623157.0
 
 
 def create_matrix(data):
@@ -54,11 +56,16 @@ def write_csv(filename, data):
 
 
 def main():
-    print('Reading CSV-file')
-    data = read_csv('data.csv')
-
-    print('Creating the matrix')
-    matrix = create_matrix(data)
+    # print('Reading CSV-file')
+    # data = read_csv('data.csv')
+    #
+    # print('Creating the matrix')
+    # matrix = create_matrix(data)
+    matrix = [[MAX_VALUE, 20, 18, 12, 8],
+              [5, MAX_VALUE, 14, 7, 11],
+              [12, 18, MAX_VALUE, 6, 11],
+              [11, 17, 11, MAX_VALUE, 12],
+              [5, 5, 5, 5, MAX_VALUE]]
 
     print('Start Solving')
     genetic.solve_tsp(matrix, len(matrix), START_POINT)
