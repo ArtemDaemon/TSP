@@ -3,12 +3,18 @@ from progress.bar import ChargingBar as Bar
 
 from .gene import Gene
 
-ITERATIONS = 100000
-POPULATION_SIZE = 500
+ITERATIONS = 1000
+POPULATION_SIZE = 100
 MUTATION_ATTEMPT_LIMIT = 100
 
 
 def create_route(length, first_step):
+    """
+    Creating a route by shuffling a list of points with an excluded starting point
+    :param length: Number of cities
+    :param first_step: Start city index
+    :return: Generated route
+    """
     route = list(range(length))
     route.remove(first_step)
     shuffle(route)
@@ -18,6 +24,13 @@ def create_route(length, first_step):
 
 
 def calculate_distance(route, matrix, length):
+    """
+    Method for calculating route distance
+    :param route: List of consecutively visited cities
+    :param matrix: Distance matrix between cities
+    :param length: Number of cities
+    :return: Route length
+    """
     distance = 0
     i = 0
     while i < length:
@@ -27,6 +40,12 @@ def calculate_distance(route, matrix, length):
 
 
 def mutate(route, length):
+    """
+    Method for route mutation. Two random elements of the route are taken (but not the first or last) and swapped
+    :param route: List of consecutively visited cities
+    :param length: Number of cities
+    :return: Mutated Route
+    """
     new_route = route.copy()
     old_index = new_index = 0
     while old_index == new_index:
@@ -41,6 +60,13 @@ def mutate(route, length):
 
 
 def create_first_generation(matrix, length, first_step):
+    """
+    Method for generating the first generation
+    :param matrix: Distance matrix between cities
+    :param length: Number of cities
+    :param first_step: Start city index
+    :return: List of first generation routes
+    """
     first_generation = []
     for i in range(POPULATION_SIZE):
         new_route = create_route(length, first_step)
@@ -49,6 +75,15 @@ def create_first_generation(matrix, length, first_step):
 
 
 def solve_tsp(matrix, length, first_step):
+    """
+    main method. First, the first generation is generated.
+    After that, each one mutates in turn until a more efficient one is found for each route.
+    Among each generation is the most effective
+    :param matrix: Distance matrix between cities
+    :param length: Number of cities
+    :param first_step: Start city index
+    :return: The route with the minimum length found
+    """
     generation = create_first_generation(matrix, length, first_step)
 
     min_distance = generation[0].get_distance()
@@ -66,7 +101,7 @@ def solve_tsp(matrix, length, first_step):
             mutated_distance = current_distance + 1
 
             attempt = 0
-            while mutated_distance <= current_distance:
+            while mutated_distance > current_distance:
                 mutated_route = mutate(current_gene.get_route(), length)
                 mutated_distance = calculate_distance(mutated_route, matrix, length)
 
